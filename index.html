@@ -1,0 +1,101 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>🍰 Share Your Recipes</h1>
+        <p>Discover, cook, and share amazing recipes with food lovers worldwide</p>
+        {% if not session.user_id %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+        {% else %}
+            <a href="{{ url_for('upload_recipe') }}" class="btn btn-primary">Upload Recipe</a>
+        {% endif %}
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="text-align:center; margin-bottom:15px; color:#2c3e50;">📂 Browse by Category</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+            <a href="{{ url_for('browse_recipes') }}" 
+               style="padding:10px 20px; background:#e74c3c; color:#fff; border-radius:25px; 
+                      text-decoration:none; font-weight:600;">
+                📋 All
+            </a>
+            {% for cat in all_categories %}
+            <a href="{{ url_for('browse_by_category', category_id=cat.id) }}" 
+               style="padding:10px 20px; background:#fff; color:#333; border-radius:25px; 
+                      text-decoration:none; border:2px solid #e0e0e0; font-weight:600;
+                      transition:all 0.3s;"
+               onmouseover="this.style.borderColor='#e74c3c'; this.style.color='#e74c3c';"
+               onmouseout="this.style.borderColor='#e0e0e0'; this.style.color='#333';">
+                {{ cat.icon }} {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Top Rated Recipes -->
+    <h2 class="section-title">⭐ Top Rated Recipes</h2>
+    <p class="section-subtitle">Our community's favorites</p>
+
+    <div class="recipe-grid">
+        {% for recipe in recipes %}
+        <div class="recipe-card">
+            <div class="img-container">
+                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                     alt="{{ recipe.title }}" 
+                     class="recipe-card-img">
+                {% if recipe.video_url %}
+                    <span class="video-badge">🎥 Video</span>
+                {% endif %}
+                {% if recipe.category_name %}
+                <span style="position:absolute; top:15px; left:15px; background:rgba(255,255,255,0.9); 
+                             padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600;">
+                    {{ recipe.category_icon }} {{ recipe.category_name }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="recipe-card-body">
+                <h3>{{ recipe.title }}</h3>
+                <p class="author">By {{ recipe.author }}</p>
+                <p class="description">{{ recipe.description[:100] }}{% if recipe.description|length > 100 %}...{% endif %}</p>
+
+                <div class="recipe-meta">
+                    <span>🍽️ {{ recipe.servings }} servings</span>
+                    <span>💬 {{ recipe.total_reviews }} reviews</span>
+                </div>
+
+                <div class="rating-badge">
+                    <span class="stars">
+                        {% set rating = recipe.avg_rating | round(1) %}
+                        {% for i in range(5) %}
+                            {% if i < rating | int %}⭐
+                            {% elif (rating - i) >= 0.5 %}⭐
+                            {% else %}<span class="empty">☆</span>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span>{{ rating }}/5</span>
+                </div>
+
+                <a href="{{ url_for('view_recipe', recipe_id=recipe.recipe_id) }}" 
+                   class="btn btn-primary btn-sm" 
+                   style="margin-top:15px; display:block; text-align:center;">
+                    👁️ View Recipe
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <p style="text-align:center; grid-column:1/-1; color:#7f8c8d; padding:40px;">
+            📭 No recipes yet. <a href="{{ url_for('register') }}">Be the first to upload!</a>
+        </p>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

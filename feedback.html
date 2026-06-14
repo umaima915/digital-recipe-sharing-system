@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-7">
+
+        <div class="card shadow-lg border-0">
+
+            <div class="card-body p-5">
+
+                <h2 class="text-center mb-4">
+                    Feedback 💬
+                </h2>
+
+                <form method="POST">
+
+                    <textarea name="message" class="form-control mb-4" rows="6"
+                        placeholder="Write your feedback"></textarea>
+
+                    <button class="btn btn-dark w-100">
+                        Submit Feedback
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

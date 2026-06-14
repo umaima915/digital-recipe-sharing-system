@@ -1,0 +1,107 @@
+<!-- templates/recipe_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="recipe-detail">
+
+        <!-- Recipe Header -->
+        <div class="recipe-detail-header">
+            <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="recipe-card-img"
+                alt="{{ recipe.title }}">
+            <div class="recipe-detail-info">
+                <h1>{{ recipe.title }}</h1>
+                <div class="meta">
+                    <span>👨‍🍳 By {{ recipe.author }}</span>
+                    <span>🍽️ {{ recipe.servings }} servings</span>
+                    <span class="rating-badge">⭐ {{ "%.1f"|format(recipe.avg_rating) }}/5 ({{ recipe.total_reviews }}
+                        reviews)</span>
+                </div>
+                <p>{{ recipe.description }}</p>
+            </div>
+        </div>
+
+        <!-- Video Section (if exists) -->
+        {% if recipe.video_url %}
+        <div class="video-container">
+            <h3>🎥 Cooking Video</h3>
+            {% set video_id = recipe.video_url.split('v=')[-1].split('&')[0] if 'v=' in recipe.video_url else '' %}
+            {% if video_id %}
+            <iframe src="https://www.youtube.com/embed/{{ video_id }}" allowfullscreen></iframe>
+            {% else %}
+            <a href="{{ recipe.video_url }}" target="_blank" class="btn btn-secondary">Watch Video</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Ingredient Calculator -->
+        <div class="calculator-box">
+            <h3>🧮 Ingredient Calculator</h3>
+            <form method="POST" class="calc-form">
+                <label>Adjust Servings:</label>
+                <input type="number" name="new_servings" value="{{ new_servings }}" min="1">
+                <button type="submit" class="btn btn-primary btn-sm">Calculate</button>
+            </form>
+
+            <div class="ingredients-list">
+                <h3>Ingredients for {{ new_servings }} serving(s)</h3>
+                <ul>
+                    {% if scaled_ingredients %}
+                    {% for ing in scaled_ingredients %}
+                    <li><span>{{ ing.name }}</span> <strong>{{ ing.quantity }} {{ ing.unit }}</strong></li>
+                    {% endfor %}
+                    {% else %}
+                    {% for ing in ingredients %}
+                    <li><span>{{ ing.name }}</span> <strong>{{ ing.quantity }} {{ ing.unit }}</strong></li>
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Review Form -->
+        {% if session.user_id %}
+        <div class="form-container" style="margin-bottom:30px;">
+            <h3>✍️ Leave a Review</h3>
+            <form method="POST" action="{{ url_for('add_review', recipe_id=recipe.recipe_id) }}">
+                <div class="form-group">
+                    <label>Rating</label>
+                    <select name="rating" class="form-control" required>
+                        <option value="">Select rating</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                        <option value="4">⭐⭐⭐⭐ (4)</option>
+                        <option value="3">⭐⭐⭐ (3)</option>
+                        <option value="2">⭐⭐ (2)</option>
+                        <option value="1">⭐ (1)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Review</label>
+                    <textarea name="review_text" class="form-control" placeholder="Share your experience..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Reviews Display -->
+        <div class="reviews-section">
+            <h3>💬 Reviews ({{ reviews|length }})</h3>
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="reviewer">👤 {{ review.username }}</span>
+                    <span>{% for i in range(review.rating) %}⭐{% endfor %}</span>
+                </div>
+                <p>{{ review.review_text or 'No comment' }}</p>
+                <small style="color:#95a5a6;">{{ review.created_at }}</small>
+            </div>
+            {% else %}
+            <p style="color:#7f8c8d;">No reviews yet. Be the first!</p>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

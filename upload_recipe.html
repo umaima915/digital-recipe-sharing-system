@@ -1,0 +1,121 @@
+<!-- templates/upload_recipe.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="section-title">📝 Upload New Recipe</h2>
+        
+        <form method="POST" id="recipeForm" enctype="multipart/form-data">
+            
+            <!-- ========== IMAGE (REQUIRED) ========== -->
+            <div class="form-group">
+                <label>📸 Recipe Image <span style="color:#e74c3c;">*</span></label>
+                <div style="border: 3px dashed #e74c3c; border-radius: 15px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s; background: #fff5f5;"
+                     id="image-drop-zone"
+                     onclick="document.getElementById('recipe_image').click()">
+                    
+                    <img id="image-preview" src="#" alt="Preview" 
+                         style="max-width: 300px; max-height: 200px; display: none; margin-bottom: 15px; border-radius: 10px;">
+                    
+                    <div id="upload-placeholder">
+                        <p style="font-size: 50px; margin: 0;">📷</p>
+                        <p style="font-weight: 600; color: #c0392b;">Upload recipe photo *</p>
+                        <p style="color: #95a5a6; font-size: 13px;">Required — JPG, PNG, GIF, WEBP (Max 16MB)</p>
+                    </div>
+                    
+                    <input type="file" name="recipe_image" id="recipe_image" 
+                           accept="image/*" style="display: none;" required
+                           onchange="previewImage(event)">
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label>📂 Category <span style="color:#e74c3c;">*</span></label>
+                <select name="category_id" class="form-control" required>
+                    <option value="">-- Select Category --</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Title -->
+            <div class="form-group">
+                <label>📝 Recipe Title <span style="color:#e74c3c;">*</span></label>
+                <input type="text" name="title" class="form-control" placeholder="e.g., Chicken Biryani" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label>📄 Description <span style="color:#e74c3c;">*</span></label>
+                <textarea name="description" class="form-control" rows="5" placeholder="Describe your recipe..." required></textarea>
+            </div>
+
+            <!-- Servings -->
+            <div class="form-group">
+                <label>🍽️ Servings <span style="color:#e74c3c;">*</span></label>
+                <input type="number" name="servings" class="form-control" value="2" min="1" required>
+            </div>
+
+            <!-- Video (Optional) -->
+            <div class="form-group">
+                <label>🎥 Video URL (Optional)</label>
+                <input type="url" name="video_url" class="form-control" placeholder="https://youtube.com/watch?v=...">
+            </div>
+
+            <!-- Ingredients -->
+            <div class="form-group">
+                <label>🧂 Ingredients <span style="color:#e74c3c;">*</span></label>
+                <div id="ingredients-container">
+                    <div class="ingredient-row">
+                        <input type="text" name="ingredient_name[]" class="form-control" placeholder="Ingredient" required>
+                        <input type="number" name="ingredient_qty[]" class="form-control qty" placeholder="Qty" step="0.01" required>
+                        <input type="text" name="ingredient_unit[]" class="form-control unit" placeholder="Unit" required>
+                    </div>
+                    <div class="ingredient-row">
+                        <input type="text" name="ingredient_name[]" class="form-control" placeholder="Ingredient">
+                        <input type="number" name="ingredient_qty[]" class="form-control qty" placeholder="Qty" step="0.01">
+                        <input type="text" name="ingredient_unit[]" class="form-control unit" placeholder="Unit">
+                    </div>
+                </div>
+                <button type="button" class="btn-add-ingredient" onclick="addIngredient()">+ Add Ingredient</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:15px; font-size:18px;">
+                🚀 Upload Recipe
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('image-preview').src = e.target.result;
+            document.getElementById('image-preview').style.display = 'block';
+            document.getElementById('upload-placeholder').style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+function addIngredient() {
+    const container = document.getElementById('ingredients-container');
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.innerHTML = `
+        <input type="text" name="ingredient_name[]" class="form-control" placeholder="Ingredient">
+        <input type="number" name="ingredient_qty[]" class="form-control qty" placeholder="Qty" step="0.01">
+        <input type="text" name="ingredient_unit[]" class="form-control unit" placeholder="Unit">
+        <button type="button" class="btn-remove-ingredient" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(row);
+}
+</script>
+
+{% endblock %}

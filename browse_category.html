@@ -1,0 +1,89 @@
+<!-- templates/browse_category.html -->
+<!-- Shows recipes filtered by category -->
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+
+    <!-- Category Header -->
+    <div class="hero" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                url('https://source.unsplash.com/1400x400/?food,{{ category.name }}') center/cover;">
+        <h1>{{ category.icon }} {{ category.name }} Recipes</h1>
+        <p>{{ category.description }}</p>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="category-bar" style="margin-bottom: 30px;">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+            <a href="{{ url_for('browse_recipes') }}" style="padding:10px 20px; background:#fff; color:#333; border-radius:25px; 
+                      text-decoration:none; border:2px solid #e0e0e0; font-weight:600;">
+                📋 All
+            </a>
+            {% for cat in all_categories %}
+            <a href="{{ url_for('browse_by_category', category_id=cat.id) }}" style="padding:10px 20px; 
+                      {% if cat.id == category.id %}
+                      background:#e74c3c; color:#fff; border:2px solid #e74c3c;
+                      {% else %}
+                      background:#fff; color:#333; border:2px solid #e0e0e0;
+                      {% endif %}
+                      border-radius:25px; text-decoration:none; font-weight:600; transition:all 0.3s;">
+                {{ cat.icon }} {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recipe Cards -->
+    <div class="recipe-grid">
+        {% for recipe in recipes %}
+        <div class="recipe-card">
+            <div class="img-container">
+                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="recipe-card-img"
+                    alt="{{ recipe.title }}">
+                {% if recipe.video_url %}
+                <span class="video-badge">🎥 Video</span>
+                {% endif %}
+            </div>
+
+            <div class="recipe-card-body">
+                <h3>{{ recipe.title }}</h3>
+                <p class="author">By {{ recipe.author }} | {{ recipe.category_icon }} {{ recipe.category_name }}</p>
+                <p class="description">{{ recipe.description[:100] }}...</p>
+
+                <div class="recipe-meta">
+                    <span>🍽️ {{ recipe.servings }} servings</span>
+                    <span>💬 {{ recipe.total_reviews }} reviews</span>
+                </div>
+
+                <div class="rating-badge">
+                    <span class="stars">
+                        {% set rating = recipe.avg_rating | round(1) %}
+                        {% for i in range(5) %}
+                        {% if i < rating | int %}⭐ {% elif (rating - i)>= 0.5 %}⭐
+                            {% else %}<span class="empty">☆</span>
+                            {% endif %}
+                            {% endfor %}
+                    </span>
+                    <span>{{ rating }}/5</span>
+                </div>
+
+                <a href="{{ url_for('view_recipe', recipe_id=recipe.recipe_id) }}" class="btn btn-primary btn-sm"
+                    style="margin-top:15px; display:block; text-align:center;">
+                    👁️ View Recipe
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div style="grid-column:1/-1; text-align:center; padding:50px;">
+            <p style="font-size:40px;">📭</p>
+            <p style="color:#7f8c8d; font-size:18px;">No recipes in this category yet!</p>
+            <a href="{{ url_for('upload_recipe') }}" class="btn btn-primary" style="margin-top:15px;">
+                ➕ Add First Recipe
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

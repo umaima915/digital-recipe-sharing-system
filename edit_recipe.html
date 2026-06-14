@@ -1,0 +1,98 @@
+<!-- templates/edit_recipe.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="section-title">✏️ Edit Recipe</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <!-- Current Image Preview -->
+            <div class="form-group" style="text-align:center;">
+                <label>📸 Current Image</label><br>
+                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}"
+                    style="width:200px; border-radius:10px; margin-bottom:10px;">
+                <br>
+                <label>Change Image (optional)</label>
+                <input type="file" name="recipe_image" class="form-control" accept="image/*">
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label>📂 Category *</label>
+                <select name="category_id" class="form-control" required>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if cat.id==recipe.category_id %}selected{% endif %}>
+                        {{ cat.icon }} {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Title -->
+            <div class="form-group">
+                <label>📝 Title *</label>
+                <input type="text" name="title" class="form-control" value="{{ recipe.title }}" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label>📄 Description *</label>
+                <textarea name="description" class="form-control" rows="5" required>{{ recipe.description }}</textarea>
+            </div>
+
+            <!-- Servings -->
+            <div class="form-group">
+                <label>🍽️ Servings *</label>
+                <input type="number" name="servings" class="form-control" value="{{ recipe.servings }}" min="1"
+                    required>
+            </div>
+
+            <!-- Video -->
+            <div class="form-group">
+                <label>🎥 Video URL (Optional)</label>
+                <input type="url" name="video_url" class="form-control" value="{{ recipe.video_url or '' }}">
+            </div>
+
+            <!-- Ingredients -->
+            <div class="form-group">
+                <label>🧂 Ingredients</label>
+                <div id="ingredients-container">
+                    {% for ing in ingredients %}
+                    <div class="ingredient-row">
+                        <input type="text" name="ingredient_name[]" class="form-control" value="{{ ing.name }}"
+                            required>
+                        <input type="number" name="ingredient_qty[]" class="form-control qty" value="{{ ing.quantity }}"
+                            step="0.01" required>
+                        <input type="text" name="ingredient_unit[]" class="form-control unit" value="{{ ing.unit }}"
+                            required>
+                        <button type="button" class="btn-remove-ingredient"
+                            onclick="this.parentElement.remove()">×</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn-add-ingredient" onclick="addIngredient()">+ Add Ingredient</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:15px;">💾 Update Recipe</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function addIngredient() {
+        const container = document.getElementById('ingredients-container');
+        const row = document.createElement('div');
+        row.className = 'ingredient-row';
+        row.innerHTML = `
+        <input type="text" name="ingredient_name[]" class="form-control" placeholder="Ingredient">
+        <input type="number" name="ingredient_qty[]" class="form-control qty" placeholder="Qty" step="0.01">
+        <input type="text" name="ingredient_unit[]" class="form-control unit" placeholder="Unit">
+        <button type="button" class="btn-remove-ingredient" onclick="this.parentElement.remove()">×</button>
+    `;
+        container.appendChild(row);
+    }
+</script>
+
+{% endblock %}

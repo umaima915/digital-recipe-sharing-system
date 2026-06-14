@@ -1,0 +1,30 @@
+<!-- templates/all_recipes.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <h2 class="section-title">🌍 All Recipes</h2>
+    <p class="section-subtitle">Browse our complete collection</p>
+
+    <div class="recipe-grid">
+        {% for recipe in recipes %}
+        <div class="recipe-card">
+            <div class="img-container">
+                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="recipe-card-img"
+                    alt="{{ recipe.title }}">
+                {% if recipe.video_url %}<span class="video-badge">🎥</span>{% endif %}
+            </div>
+            <div class="recipe-card-body">
+                <h3>{{ recipe.title }}</h3>
+                <p class="author">By {{ recipe.author }}</p>
+                <p class="description">{{ recipe.description[:120] }}...</p>
+                <div class="rating-badge">⭐ {{ "%.1f"|format(recipe.avg_rating) }}/5</div>
+                <a href="{{ url_for('view_recipe', recipe_id=recipe.recipe_id) }}" class="btn btn-primary btn-sm"
+                    style="margin-top:15px; display:block; text-align:center;">👁️ View Recipe</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
